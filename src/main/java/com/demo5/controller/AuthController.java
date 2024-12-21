@@ -1,8 +1,10 @@
 package com.demo5.controller;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,13 +39,16 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginDto loginDto) {
-        Optional<User> userOptional = authService.authenticate(loginDto.getUsername(), loginDto.getPassword());
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+        System.out.println("Email: " + loginDto.getEmail()); // Логируем email
+        System.out.println("Пароль: " + loginDto.getPassword());
+        Optional<User> userOptional = authService.authenticate(loginDto.getEmail(), loginDto.getPassword());
 
         if (userOptional.isPresent()) {
-            return "Аутентификация успешна";
+            return ResponseEntity.ok(Collections.singletonMap("message", "Аутентификация успешна")); // Возвращаем JSON с сообщением
         } else {
-            return "Ошибка аутентификации"; // Или можете возвращать кастомизированные статус-коды.
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Неверный email или пароль.")); // JSON с сообщением об ошибке
         }
     }
+
 }
