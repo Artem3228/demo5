@@ -1,6 +1,8 @@
 package com.demo5.controller;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +45,13 @@ public class AuthController {
         System.out.println("Email: " + loginDto.getEmail()); // Логируем email
         System.out.println("Пароль: " + loginDto.getPassword());
         Optional<User> userOptional = authService.authenticate(loginDto.getEmail(), loginDto.getPassword());
-
         if (userOptional.isPresent()) {
-            return ResponseEntity.ok(Collections.singletonMap("message", "Аутентификация успешна")); // Возвращаем JSON с сообщением
+            User user = userOptional.get();
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Аутентификация успешна");
+            response.put("username", user.getUsername()); // Возвращаем имя
+            response.put("subname", user.getSubname()); // Возвращаем фамилию
+            return ResponseEntity.ok(response); // Возвращаем JSON с сообщением и данными пользователя
         } else {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Неверный email или пароль.")); // JSON с сообщением об ошибке
         }
